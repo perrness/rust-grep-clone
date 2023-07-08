@@ -2,7 +2,7 @@
 
 use std::{
     fs::File,
-    io::{self, BufRead, BufReader, BufWriter, StdoutLock, Write},
+    io::{self, BufRead, BufReader, BufWriter, Read, StdoutLock, Write},
 };
 
 use anyhow::{Context, Result};
@@ -33,21 +33,30 @@ fn main() -> Result<()> {
         .with_context(|| format!("could not read file: `{:?}`", &args.filepath))?;
     let mut reader = BufReader::new(file);
 
+    let mut contents = String::new();
+    reader.read_to_string(&mut contents);
+
     info!("getting lock to stdout");
     let stdout = io::stdout();
     let mut handle = stdout.lock();
 
-    find_matches(reader, &args.pattern, &mut handle);
+    find_matches(&contents, &args.pattern, &mut handle);
 
     Ok(())
 }
 
-fn find_matches(reader: BufReader<File>, pattern: &String, mut handle: impl Write) {
-    for line in reader.lines() {
+fn find_matches(content: &str, pattern: &str, mut handle: impl Write) {
+    for line in content.lines() {
         info!("reading line {:?}", line);
-        let l = line.expect("Can't read line from file :S");
-        if l.contains(pattern) {
-            writeln!(handle, "{}", l);
+        if line.contains(pattern) {
+            writeln!(handle, "{}", line);
         }
     }
+}
+
+#[test]
+fn find_a_match() {
+    let mut result = Vec::new();
+    find_matches("lorem ipsum\ndolor sit amet", "lorem", &mut result);
+    assert_eq!(result, b"lorem ipsum\n")
 }
