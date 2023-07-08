@@ -5,6 +5,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+use anyhow::{Context, Result};
 use clap::Parser;
 
 /// Search for a pattern in a file and display the lines that contains it
@@ -19,10 +20,11 @@ struct Cli {
     filepath: std::path::PathBuf,
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<()> {
     let args = Cli::parse();
 
-    let file = File::open(args.filepath)?;
+    let file = File::open(&args.filepath)
+        .with_context(|| format!("could not read file: `{:?}`", &args.filepath))?;
     let mut reader = BufReader::new(file);
 
     for line in reader.lines() {
