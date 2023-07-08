@@ -28,7 +28,7 @@ fn main() -> Result<()> {
     let mut reader = BufReader::new(file);
 
     let stdout = io::stdout();
-    let mut handle = io::BufWriter::new(stdout);
+    let mut handle = stdout.lock();
 
     for line in reader.lines() {
         let l = line.expect("Can't read line from file :S");
