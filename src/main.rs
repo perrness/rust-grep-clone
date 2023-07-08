@@ -7,6 +7,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use clap::Parser;
+use log::info;
 
 /// Search for a pattern in a file and display the lines that contains it
 #[derive(Parser)]
@@ -21,16 +22,23 @@ struct Cli {
 }
 
 fn main() -> Result<()> {
-    let args = Cli::parse();
+    env_logger::init();
+    info!("starting up!");
 
+    let args = Cli::parse();
+    info!("parsing params");
+
+    info!("starting opening file");
     let file = File::open(&args.filepath)
         .with_context(|| format!("could not read file: `{:?}`", &args.filepath))?;
     let mut reader = BufReader::new(file);
 
+    info!("getting lock to stdout");
     let stdout = io::stdout();
     let mut handle = stdout.lock();
 
     for line in reader.lines() {
+        info!("reading line {:?}", line);
         let l = line.expect("Can't read line from file :S");
         if l.contains(&args.pattern) {
             writeln!(handle, "{}", l);
