@@ -2,7 +2,7 @@
 
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{self, BufRead, BufReader, BufWriter, Write},
 };
 
 use anyhow::{Context, Result};
@@ -27,10 +27,13 @@ fn main() -> Result<()> {
         .with_context(|| format!("could not read file: `{:?}`", &args.filepath))?;
     let mut reader = BufReader::new(file);
 
+    let stdout = io::stdout();
+    let mut handle = io::BufWriter::new(stdout);
+
     for line in reader.lines() {
         let l = line.expect("Can't read line from file :S");
         if l.contains(&args.pattern) {
-            println!("{}", l);
+            writeln!(handle, "{}", l);
         }
     }
 
