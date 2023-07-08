@@ -2,7 +2,7 @@
 
 use std::{
     fs::File,
-    io::{self, BufRead, BufReader, BufWriter, Write},
+    io::{self, BufRead, BufReader, BufWriter, StdoutLock, Write},
 };
 
 use anyhow::{Context, Result};
@@ -37,13 +37,17 @@ fn main() -> Result<()> {
     let stdout = io::stdout();
     let mut handle = stdout.lock();
 
+    find_matches(reader, &args.pattern, &mut handle);
+
+    Ok(())
+}
+
+fn find_matches(reader: BufReader<File>, pattern: &String, mut handle: impl Write) {
     for line in reader.lines() {
         info!("reading line {:?}", line);
         let l = line.expect("Can't read line from file :S");
-        if l.contains(&args.pattern) {
+        if l.contains(pattern) {
             writeln!(handle, "{}", l);
         }
     }
-
-    Ok(())
 }
