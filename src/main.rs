@@ -49,7 +49,8 @@ fn find_matches(content: &str, pattern: &str, mut handle: impl Write) {
     for line in content.lines() {
         info!("reading line {:?}", line);
         if line.contains(pattern) {
-            writeln!(handle, "{}", line);
+            writeln!(handle, "{}", line)
+                .with_context(|| format!("buffer is full, can't print anymore"));
         }
     }
 }
