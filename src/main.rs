@@ -8,6 +8,7 @@ use std::{
 use anyhow::{Context, Result};
 use clap::Parser;
 use log::info;
+use rust_grep_clone::find_matches;
 
 /// Search for a pattern in a file and display the lines that contains it
 #[derive(Parser)]
@@ -43,21 +44,4 @@ fn main() -> Result<()> {
     find_matches(&contents, &args.pattern, &mut handle);
 
     Ok(())
-}
-
-fn find_matches(content: &str, pattern: &str, mut handle: impl Write) {
-    for line in content.lines() {
-        info!("reading line {:?}", line);
-        if line.contains(pattern) {
-            writeln!(handle, "{}", line)
-                .with_context(|| format!("buffer is full, can't print anymore"));
-        }
-    }
-}
-
-#[test]
-fn find_a_match() {
-    let mut result = Vec::new();
-    find_matches("lorem ipsum\ndolor sit amet", "lorem", &mut result);
-    assert_eq!(result, b"lorem ipsum\n")
 }
