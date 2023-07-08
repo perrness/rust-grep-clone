@@ -14,3 +14,4 @@ log = "0.4.19"
 [dev-dependencies]
 assert_cmd = "2.0.11"
 predicates = "3.0.3"
+assert_fs = "1.0.13"
