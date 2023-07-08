@@ -26,13 +26,9 @@ fn main() -> std::io::Result<()> {
     let mut reader = BufReader::new(file);
 
     for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                if line.contains(&args.pattern) {
-                    println!("{}", line)
-                }
-            }
-            Err(error) => panic!("Probleming reading line from file!"),
+        let l = line.expect("Can't read line from file :S");
+        if l.contains(&args.pattern) {
+            println!("{}", l);
         }
     }
 
